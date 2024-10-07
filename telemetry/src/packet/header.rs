@@ -1,5 +1,7 @@
 use serde::{Deserialize, Serialize};
 
+use super::{FromBytes, Header};
+
 #[derive(Debug, Clone, Copy, PartialEq, Deserialize, Serialize)]
 #[repr(C, packed)]
 pub struct PacketHeader {
@@ -29,12 +31,18 @@ pub struct PacketHeader {
     pub secondary_player_car_index: u8,
 }
 
-impl crate::FromBytes for PacketHeader {
+impl FromBytes for PacketHeader {
     fn from_bytes(buf: &[u8]) -> Result<PacketHeader, super::PacketError> {
         let cursor = std::io::Cursor::new(buf);
         match bincode::deserialize_from::<_, PacketHeader>(cursor) {
             Ok(header) => Ok(header),
             Err(e) => Err(e.into()),
         }
+    }
+}
+
+impl Header for PacketHeader {
+    fn header(&self) -> PacketHeader {
+        self.clone()
     }
 }

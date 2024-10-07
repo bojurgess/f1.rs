@@ -1,6 +1,6 @@
 use serde::{Deserialize, Serialize};
 
-use super::{FromBytes, PacketError};
+use super::{FromBytes, Header, PacketError};
 
 #[derive(Debug, Clone, Copy, PartialEq, Deserialize, Serialize)]
 #[repr(C, packed)]
@@ -67,5 +67,11 @@ impl FromBytes for PacketMotionData {
             Ok(packet) => Ok(packet),
             Err(e) => Err(e.into()),
         }
+    }
+}
+
+impl Header for PacketMotionData {
+    fn header(&self) -> super::header::PacketHeader {
+        self.header.clone()
     }
 }

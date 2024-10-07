@@ -1,10 +1,12 @@
 mod header;
 mod motion;
+mod session;
 
 use std::fmt::Display;
 
 pub use header::PacketHeader;
 pub use motion::PacketMotionData;
+pub use session::PacketSessionData;
 
 #[derive(Debug, PartialEq, Clone, serde::Serialize, serde::Deserialize)]
 pub enum PacketID {
@@ -52,6 +54,7 @@ pub enum Packet {
     Header(PacketHeader),
 
     Motion(PacketMotionData),
+    Session(PacketSessionData),
 }
 
 #[derive(Debug)]
@@ -76,6 +79,10 @@ pub trait FromBytes {
         Self: Sized;
 }
 
+pub trait Header {
+    fn header(&self) -> PacketHeader;
+}
+
 // allows usage of `?` operator with `PacketError`
 impl From<Box<bincode::ErrorKind>> for PacketError {
     fn from(e: Box<bincode::ErrorKind>) -> Self {
@@ -89,7 +96,18 @@ impl FromBytes for Packet {
 
         match PacketID::from(header.packet_id) {
             PacketID::Motion => Ok(Packet::Motion(PacketMotionData::from_bytes(buf)?)),
+            PacketID::Session => Ok(Packet::Session(PacketSessionData::from_bytes(buf)?)),
             _ => Err(PacketError::InvalidPacketID(header.packet_id)),
+        }
+    }
+}
+
+impl Header for Packet {
+    fn header(&self) -> PacketHeader {
+        match self {
+            Packet::Header(header) => header.clone(),
+            Packet::Motion(data) => data.header(),
+            Packet::Session(data) => data.header(),
         }
     }
 }
