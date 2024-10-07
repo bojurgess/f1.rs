@@ -72,15 +72,15 @@ impl Display for PacketError {
     }
 }
 
-/// Custom implementation of the From<[&u8]> trait specifically for Packet types. This allows us to return a result type for better error handling.
 pub trait FromBytes {
     fn from_bytes(buf: &[u8]) -> Result<Self, PacketError>
     where
         Self: Sized;
 }
 
-pub trait Header {
+pub trait Attributes {
     fn header(&self) -> PacketHeader;
+    fn packet_id(&self) -> PacketID;
 }
 
 // allows usage of `?` operator with `PacketError`
@@ -102,12 +102,20 @@ impl FromBytes for Packet {
     }
 }
 
-impl Header for Packet {
+impl Attributes for Packet {
     fn header(&self) -> PacketHeader {
         match self {
             Packet::Header(header) => header.clone(),
             Packet::Motion(data) => data.header(),
             Packet::Session(data) => data.header(),
+        }
+    }
+
+    fn packet_id(&self) -> PacketID {
+        match self {
+            Packet::Header(header) => header.packet_id(),
+            Packet::Motion(data) => data.packet_id(),
+            Packet::Session(data) => data.packet_id(),
         }
     }
 }

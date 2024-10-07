@@ -1,6 +1,6 @@
 use serde::{Deserialize, Serialize};
 
-use super::{FromBytes, Header};
+use super::{Attributes, FromBytes, PacketID};
 
 #[derive(Debug, Clone, Copy, PartialEq, Deserialize, Serialize)]
 #[repr(C, packed)]
@@ -41,8 +41,12 @@ impl FromBytes for PacketHeader {
     }
 }
 
-impl Header for PacketHeader {
+impl Attributes for PacketHeader {
     fn header(&self) -> PacketHeader {
         self.clone()
+    }
+
+    fn packet_id(&self) -> PacketID {
+        self.packet_id.into()
     }
 }

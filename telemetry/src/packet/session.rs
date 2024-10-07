@@ -1,4 +1,4 @@
-use super::{FromBytes, Header, PacketHeader};
+use super::{Attributes, FromBytes, PacketHeader, PacketID};
 use serde_big_array::BigArray;
 
 /// # Session Packet
@@ -234,9 +234,13 @@ impl FromBytes for PacketSessionData {
     }
 }
 
-impl Header for PacketSessionData {
+impl Attributes for PacketSessionData {
     fn header(&self) -> PacketHeader {
         self.header.clone()
+    }
+
+    fn packet_id(&self) -> PacketID {
+        self.header.packet_id.into()
     }
 }
 
