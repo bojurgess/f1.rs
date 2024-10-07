@@ -2,6 +2,43 @@ use serde::{Deserialize, Serialize};
 
 use super::{Attributes, FromBytes, PacketError, PacketID};
 
+/// # Motion Packet
+///
+/// The motion packet gives physics data for all the cars being driven.  
+/// *N.B. For the normalised vectors below, to convert to float values divide by 32767.0f -*
+/// *16-bit signed values are used to pack the data and on the assumption that direction values are always between -1.0f
+/// and 1.0f*
+///
+/// Frequency: Rate as specified in menus  
+/// Size: 1349 bytes  
+/// Version: 1
+#[derive(Debug, Clone, Copy, PartialEq, Deserialize, Serialize)]
+#[repr(C, packed)]
+pub struct PacketMotionData {
+    pub header: super::header::PacketHeader,
+    pub car_motion_data: [CarMotionData; 22],
+}
+
+impl FromBytes for PacketMotionData {
+    fn from_bytes(buf: &[u8]) -> Result<PacketMotionData, PacketError> {
+        let cursor = std::io::Cursor::new(buf);
+        match bincode::deserialize_from::<_, PacketMotionData>(cursor) {
+            Ok(packet) => Ok(packet),
+            Err(e) => Err(e.into()),
+        }
+    }
+}
+
+impl Attributes for PacketMotionData {
+    fn header(&self) -> super::header::PacketHeader {
+        self.header.clone()
+    }
+
+    fn packet_id(&self) -> PacketID {
+        self.header.packet_id.into()
+    }
+}
+
 #[derive(Debug, Clone, Copy, PartialEq, Deserialize, Serialize)]
 #[repr(C, packed)]
 pub struct CarMotionData {
@@ -41,41 +78,4 @@ pub struct CarMotionData {
     pub m_pitch: f32,
     /// Roll angle in radians
     pub m_roll: f32,
-}
-
-/// # Motion Packet
-///
-/// The motion packet gives physics data for all the cars being driven.  
-/// *N.B. For the normalised vectors below, to convert to float values divide by 32767.0f -*
-/// *16-bit signed values are used to pack the data and on the assumption that direction values are always between -1.0f
-/// and 1.0f*
-///
-/// Frequency: Rate as specified in menus  
-/// Size: 1349 bytes  
-/// Version: 1
-#[derive(Debug, Clone, Copy, PartialEq, Deserialize, Serialize)]
-#[repr(C, packed)]
-pub struct PacketMotionData {
-    pub header: super::header::PacketHeader,
-    pub car_motion_data: [CarMotionData; 22],
-}
-
-impl FromBytes for PacketMotionData {
-    fn from_bytes(buf: &[u8]) -> Result<PacketMotionData, PacketError> {
-        let cursor = std::io::Cursor::new(buf);
-        match bincode::deserialize_from::<_, PacketMotionData>(cursor) {
-            Ok(packet) => Ok(packet),
-            Err(e) => Err(e.into()),
-        }
-    }
-}
-
-impl Attributes for PacketMotionData {
-    fn header(&self) -> super::header::PacketHeader {
-        self.header.clone()
-    }
-
-    fn packet_id(&self) -> PacketID {
-        self.header.packet_id.into()
-    }
 }
