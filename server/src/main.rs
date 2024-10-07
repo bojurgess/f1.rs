@@ -1,3 +1,4 @@
+use telemetry::FromBytes;
 use tokio::net::{ToSocketAddrs, UdpSocket};
 
 pub struct Server {

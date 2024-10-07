@@ -1,5 +1,7 @@
 use serde::{Deserialize, Serialize};
 
+use super::{FromBytes, PacketError};
+
 #[derive(Debug, Clone, Copy, PartialEq, Deserialize, Serialize)]
 #[repr(C, packed)]
 pub struct CarMotionData {
@@ -58,9 +60,12 @@ pub struct PacketMotionData {
     pub car_motion_data: [CarMotionData; 22],
 }
 
-impl PacketMotionData {
-    pub fn from_bytes(buf: &[u8]) -> Result<PacketMotionData, Box<bincode::ErrorKind>> {
+impl FromBytes for PacketMotionData {
+    fn from_bytes(buf: &[u8]) -> Result<PacketMotionData, PacketError> {
         let cursor = std::io::Cursor::new(buf);
-        bincode::deserialize_from::<_, PacketMotionData>(cursor)
+        match bincode::deserialize_from::<_, PacketMotionData>(cursor) {
+            Ok(packet) => Ok(packet),
+            Err(e) => Err(e.into()),
+        }
     }
 }

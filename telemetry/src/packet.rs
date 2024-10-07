@@ -69,6 +69,13 @@ impl Display for PacketError {
     }
 }
 
+/// Custom implementation of the From<[&u8]> trait specifically for Packet types. This allows us to return a result type for better error handling.
+pub trait FromBytes {
+    fn from_bytes(buf: &[u8]) -> Result<Self, PacketError>
+    where
+        Self: Sized;
+}
+
 // allows usage of `?` operator with `PacketError`
 impl From<Box<bincode::ErrorKind>> for PacketError {
     fn from(e: Box<bincode::ErrorKind>) -> Self {
@@ -76,10 +83,9 @@ impl From<Box<bincode::ErrorKind>> for PacketError {
     }
 }
 
-impl Packet {
-    pub fn from_bytes(buf: &[u8]) -> Result<Packet, PacketError> {
-        let header =
-            PacketHeader::from_bytes(buf).map_err(|e| PacketError::SerialisationError(e))?;
+impl FromBytes for Packet {
+    fn from_bytes(buf: &[u8]) -> Result<Packet, PacketError> {
+        let header = PacketHeader::from_bytes(buf)?;
 
         match PacketID::from(header.packet_id) {
             PacketID::Motion => Ok(Packet::Motion(PacketMotionData::from_bytes(buf)?)),

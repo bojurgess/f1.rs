@@ -29,9 +29,12 @@ pub struct PacketHeader {
     pub secondary_player_car_index: u8,
 }
 
-impl PacketHeader {
-    pub fn from_bytes(buf: &[u8]) -> Result<PacketHeader, Box<bincode::ErrorKind>> {
+impl crate::FromBytes for PacketHeader {
+    fn from_bytes(buf: &[u8]) -> Result<PacketHeader, super::PacketError> {
         let cursor = std::io::Cursor::new(buf);
-        bincode::deserialize_from::<_, PacketHeader>(cursor)
+        match bincode::deserialize_from::<_, PacketHeader>(cursor) {
+            Ok(header) => Ok(header),
+            Err(e) => Err(e.into()),
+        }
     }
 }
