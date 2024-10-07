@@ -1,3 +1,4 @@
+mod event;
 mod header;
 mod lap;
 mod motion;
@@ -5,6 +6,7 @@ mod session;
 
 use std::fmt::Display;
 
+pub use event::PacketEventData;
 pub use header::PacketHeader;
 pub use lap::PacketLapData;
 pub use motion::PacketMotionData;
@@ -58,12 +60,15 @@ pub enum Packet {
     Motion(PacketMotionData),
     Session(PacketSessionData),
     Lap(PacketLapData),
+    Event(PacketEventData),
 }
 
 #[derive(Debug)]
 pub enum PacketError {
     SerialisationError(Box<bincode::ErrorKind>),
     InvalidPacketID(u8),
+    EventCodeOutOfBounds(usize),
+    EventDecodeError(),
 }
 
 impl Display for PacketError {
@@ -71,6 +76,10 @@ impl Display for PacketError {
         match self {
             PacketError::SerialisationError(e) => write!(f, "Serialisation error: {:#?}", e),
             PacketError::InvalidPacketID(id) => write!(f, "Invalid packet ID: {}", id),
+            PacketError::EventCodeOutOfBounds(id) => {
+                write!(f, "Event code of length {} is out of bounds", id)
+            }
+            PacketError::EventDecodeError() => write!(f, "Failed to decode event data"),
         }
     }
 }
@@ -101,6 +110,7 @@ impl FromBytes for Packet {
             PacketID::Motion => Ok(Packet::Motion(PacketMotionData::from_bytes(buf)?)),
             PacketID::Session => Ok(Packet::Session(PacketSessionData::from_bytes(buf)?)),
             PacketID::Lap => Ok(Packet::Lap(PacketLapData::from_bytes(buf)?)),
+            PacketID::Event => Ok(Packet::Event(PacketEventData::from_bytes(buf)?)),
             _ => Err(PacketError::InvalidPacketID(header.packet_id)),
         }
     }
@@ -113,6 +123,7 @@ impl Attributes for Packet {
             Packet::Motion(data) => data.header(),
             Packet::Session(data) => data.header(),
             Packet::Lap(data) => data.header(),
+            Packet::Event(data) => data.header(),
         }
     }
 
@@ -122,6 +133,7 @@ impl Attributes for Packet {
             Packet::Motion(data) => data.packet_id(),
             Packet::Session(data) => data.packet_id(),
             Packet::Lap(data) => data.packet_id(),
+            Packet::Event(data) => data.packet_id(),
         }
     }
 }
