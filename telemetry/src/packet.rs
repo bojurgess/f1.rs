@@ -1,8 +1,10 @@
 mod header;
+mod motion;
 
 use std::fmt::Display;
 
 pub use header::PacketHeader;
+pub use motion::PacketMotionData;
 
 #[derive(Debug, PartialEq, Clone, serde::Serialize, serde::Deserialize)]
 pub enum PacketID {
@@ -48,6 +50,8 @@ impl From<u8> for PacketID {
 pub enum Packet {
     // testing purposes only
     Header(PacketHeader),
+
+    Motion(PacketMotionData),
 }
 
 #[derive(Debug)]
@@ -65,11 +69,20 @@ impl Display for PacketError {
     }
 }
 
+// allows usage of `?` operator with `PacketError`
+impl From<Box<bincode::ErrorKind>> for PacketError {
+    fn from(e: Box<bincode::ErrorKind>) -> Self {
+        PacketError::SerialisationError(e)
+    }
+}
+
 impl Packet {
     pub fn from_bytes(buf: &[u8]) -> Result<Packet, PacketError> {
         let header =
             PacketHeader::from_bytes(buf).map_err(|e| PacketError::SerialisationError(e))?;
+
         match PacketID::from(header.packet_id) {
+            PacketID::Motion => Ok(Packet::Motion(PacketMotionData::from_bytes(buf)?)),
             _ => Err(PacketError::InvalidPacketID(header.packet_id)),
         }
     }
