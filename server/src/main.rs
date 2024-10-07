@@ -21,7 +21,7 @@ impl Server {
                     println!("{:#?}", packet);
                 }
                 Err(e) => {
-                    eprintln!("Failed to deserialize packet: {:#?}", e);
+                    eprintln!("{e}");
                 }
             }
         }

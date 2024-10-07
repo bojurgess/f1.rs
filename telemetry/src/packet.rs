@@ -1,5 +1,7 @@
 mod header;
 
+use std::fmt::Display;
+
 pub use header::PacketHeader;
 
 #[derive(Debug, PartialEq, Clone, serde::Serialize, serde::Deserialize)]
@@ -48,11 +50,27 @@ pub enum Packet {
     Header(PacketHeader),
 }
 
+#[derive(Debug)]
+pub enum PacketError {
+    SerialisationError(Box<bincode::ErrorKind>),
+    InvalidPacketID(u8),
+}
+
+impl Display for PacketError {
+    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
+        match self {
+            PacketError::SerialisationError(e) => write!(f, "Serialisation error: {:#?}", e),
+            PacketError::InvalidPacketID(id) => write!(f, "Invalid packet ID: {}", id),
+        }
+    }
+}
+
 impl Packet {
-    pub fn from_bytes(buf: &[u8]) -> Result<Packet, Box<bincode::ErrorKind>> {
-        let header = PacketHeader::from_bytes(buf)?;
+    pub fn from_bytes(buf: &[u8]) -> Result<Packet, PacketError> {
+        let header =
+            PacketHeader::from_bytes(buf).map_err(|e| PacketError::SerialisationError(e))?;
         match PacketID::from(header.packet_id) {
-            _ => Ok(Packet::Header(header)),
+            _ => Err(PacketError::InvalidPacketID(header.packet_id)),
         }
     }
 }
