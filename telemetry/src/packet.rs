@@ -1,10 +1,12 @@
 mod header;
+mod lap;
 mod motion;
 mod session;
 
 use std::fmt::Display;
 
 pub use header::PacketHeader;
+pub use lap::PacketLapData;
 pub use motion::PacketMotionData;
 pub use session::PacketSessionData;
 
@@ -12,7 +14,7 @@ pub use session::PacketSessionData;
 pub enum PacketID {
     Motion,
     Session,
-    LapData,
+    Lap,
     Event,
     Participants,
     CarSetups,
@@ -31,7 +33,7 @@ impl From<u8> for PacketID {
         match val {
             0 => PacketID::Motion,
             1 => PacketID::Session,
-            2 => PacketID::LapData,
+            2 => PacketID::Lap,
             3 => PacketID::Event,
             4 => PacketID::Participants,
             5 => PacketID::CarSetups,
@@ -55,6 +57,7 @@ pub enum Packet {
 
     Motion(PacketMotionData),
     Session(PacketSessionData),
+    Lap(PacketLapData),
 }
 
 #[derive(Debug)]
@@ -97,6 +100,7 @@ impl FromBytes for Packet {
         match PacketID::from(header.packet_id) {
             PacketID::Motion => Ok(Packet::Motion(PacketMotionData::from_bytes(buf)?)),
             PacketID::Session => Ok(Packet::Session(PacketSessionData::from_bytes(buf)?)),
+            PacketID::Lap => Ok(Packet::Lap(PacketLapData::from_bytes(buf)?)),
             _ => Err(PacketError::InvalidPacketID(header.packet_id)),
         }
     }
@@ -108,6 +112,7 @@ impl Attributes for Packet {
             Packet::Header(header) => header.clone(),
             Packet::Motion(data) => data.header(),
             Packet::Session(data) => data.header(),
+            Packet::Lap(data) => data.header(),
         }
     }
 
@@ -116,6 +121,7 @@ impl Attributes for Packet {
             Packet::Header(header) => header.packet_id(),
             Packet::Motion(data) => data.packet_id(),
             Packet::Session(data) => data.packet_id(),
+            Packet::Lap(data) => data.packet_id(),
         }
     }
 }
