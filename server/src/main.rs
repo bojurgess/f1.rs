@@ -15,7 +15,15 @@ impl Server {
         loop {
             let (len, addr) = self.socket.recv_from(&mut buf).await?;
 
-            println!("Received {} bytes from {}", len, addr);
+            match telemetry::Packet::from_bytes(&buf[..len]) {
+                Ok(packet) => {
+                    println!("Received {} bytes from {}", len, addr);
+                    println!("{:#?}", packet);
+                }
+                Err(e) => {
+                    eprintln!("Failed to deserialize packet: {:#?}", e);
+                }
+            }
         }
     }
 }
