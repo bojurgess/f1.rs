@@ -85,6 +85,87 @@ impl FromBytes for PacketEventData {
 
 #[derive(Debug, Clone, Copy, PartialEq, serde::Deserialize, serde::Serialize)]
 #[repr(u8)]
+pub enum PenaltyType {
+    DriveThrough,
+    StopGo,
+    GridPenalty,
+    PenaltyReminder,
+    TimePenalty,
+    Warning,
+    Disqualified,
+    RemovedFromFormationLap,
+    ParkedTooLongTimer,
+    TyreRegulation,
+    ThisLapInvalidated,
+    ThisAndNextLapInvalidated,
+    ThisAndPreviousLapInvalidated,
+    ThisAndPreviousLapInvalidatedWithoutReason,
+    Retired,
+    BlackFlagTimer,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, serde::Deserialize, serde::Serialize)]
+#[repr(u8)]
+pub enum InfringementType {
+    BlockingBySlowDriving,
+    BlockingByWrongWayDriving,
+    ReversingOffTheStartLine,
+    BigCollision,
+    SmallCollision,
+    CollisionFailedToHandBackPositionSingle,
+    CollisionFailedToHandBackPositionMultiple,
+    CornerCuttingGainedTime,
+    CornerCuttingOvertakeSingle,
+    CornerCuttingOvertakeMultiple,
+    CrossedPitExitLane,
+    IgnoringBlueFlags,
+    IgnoringYellowFlags,
+    IgnoringDriveThrough,
+    TooManyDriveThroughs,
+    DriveThroughReminderServeWithinNLaps,
+    DriveThroughReminderServeThisLap,
+    PitLaneSpeeding,
+    ParkedForTooLong,
+    IgnoringTyreRegulations,
+    TooManyPenalties,
+    MultipleWarnings,
+    ApproachingDisqualification,
+    TyreRegulationsSelectSingle,
+    TyreRegulationsSelectMultiple,
+    LapInvalidatedCornerCutting,
+    LapInvalidatedRunningWide,
+    CornerCuttingRanWideGaintedTimeMinor,
+    CornerCuttingRanWideGaintedTimeSignificant,
+    CornerCuttingRanWideGaintedTimeExtreme,
+    LapInvalidatedWallRiding,
+    LapInvalidatedFlashbackUsed,
+    LapInvalidatedResetToTrack,
+    BlockingThePitlane,
+    JumpStart,
+    SafetyCarToCarCollision,
+    SafetyCarIllegalOvertake,
+    SafetyCarExceedingAllowedPace,
+    VirtualSafetyCarExceedingAllowedPace,
+    FormationLapBelowAllowedSpeed,
+    FormationLapParking,
+    RetiredMechanicalFailure,
+    RetiredTerminallyDamaged,
+    SafetyCarFallingTooFarBack,
+    BlackFlagTimer,
+    UnservedStopGoPenalty,
+    UnservedDriveThroughPenalty,
+    EngineComponentChange,
+    GearboxChange,
+    ParcFermeChange,
+    LeagueGridPenalty,
+    RetryPenalty,
+    IllegalTimeGain,
+    MandatoryPistop,
+    AttributeAssigned,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, serde::Deserialize, serde::Serialize)]
+#[repr(u8)]
 pub enum EventDataDetails {
     FastestLap(FastestLap),
     Retirement(Retirement),
@@ -141,9 +222,9 @@ pub struct RaceWinner {
 #[repr(C, packed)]
 pub struct Penalty {
     /// Penalty type – see Appendices
-    pub penalty_type: u8,
+    pub penalty_type: PenaltyType,
     /// Infringement type – see Appendices
-    pub infringement_type: u8,
+    pub infringement_type: InfringementType,
     /// Vehicle index of the car the penalty is applied to
     pub vehicle_idx: u8,
     /// Vehicle index of the other car involved
