@@ -2,6 +2,7 @@ mod event;
 mod header;
 mod lap;
 mod motion;
+mod participants;
 mod session;
 
 use std::fmt::Display;
@@ -10,6 +11,7 @@ pub use event::PacketEventData;
 pub use header::PacketHeader;
 pub use lap::PacketLapData;
 pub use motion::PacketMotionData;
+pub use participants::PacketParticipantsData;
 pub use session::PacketSessionData;
 
 #[derive(Debug, PartialEq, Clone, serde::Serialize, serde::Deserialize)]
@@ -61,6 +63,7 @@ pub enum Packet {
     Session(PacketSessionData),
     Lap(PacketLapData),
     Event(PacketEventData),
+    Participants(PacketParticipantsData),
 }
 
 #[derive(Debug)]
@@ -111,6 +114,9 @@ impl FromBytes for Packet {
             PacketID::Session => Ok(Packet::Session(PacketSessionData::from_bytes(buf)?)),
             PacketID::Lap => Ok(Packet::Lap(PacketLapData::from_bytes(buf)?)),
             PacketID::Event => Ok(Packet::Event(PacketEventData::from_bytes(buf)?)),
+            PacketID::Participants => Ok(Packet::Participants(PacketParticipantsData::from_bytes(
+                buf,
+            )?)),
             _ => Err(PacketError::InvalidPacketID(header.packet_id)),
         }
     }
@@ -124,6 +130,7 @@ impl Attributes for Packet {
             Packet::Session(data) => data.header(),
             Packet::Lap(data) => data.header(),
             Packet::Event(data) => data.header(),
+            Packet::Participants(data) => data.header(),
         }
     }
 
@@ -134,6 +141,7 @@ impl Attributes for Packet {
             Packet::Session(data) => data.packet_id(),
             Packet::Lap(data) => data.packet_id(),
             Packet::Event(data) => data.packet_id(),
+            Packet::Participants(data) => data.packet_id(),
         }
     }
 }

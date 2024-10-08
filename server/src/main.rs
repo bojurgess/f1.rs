@@ -1,4 +1,4 @@
-use telemetry::FromBytes;
+use telemetry::{Attributes, FromBytes};
 use tokio::net::{ToSocketAddrs, UdpSocket};
 
 pub struct Server {
@@ -19,7 +19,14 @@ impl Server {
             match telemetry::Packet::from_bytes(&buf[..len]) {
                 Ok(packet) => {
                     println!("Received {} bytes from {}", len, addr);
-                    println!("{:#?}", packet);
+
+                    if telemetry::PacketID::from(packet.header().packet_id)
+                        == telemetry::PacketID::Participants
+                    {
+                        println!("{:#?}", packet);
+                    }
+
+                    //println!("{:#?}", packet);
                 }
                 Err(e) => {
                     eprintln!("{e}");
