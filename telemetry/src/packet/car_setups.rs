@@ -1,6 +1,16 @@
 use super::FromBytes;
 
+/// # Car Setups packet
+///
+/// This packet details the car setups for each vehicle in the session. In
+/// multiplayer games, other player cars will appear as blank, and spectators
+/// cannot see any car setups.
+///
+/// Frequency: 2 per second  
+/// Size: 1107 bytes  
+/// Version: 1
 #[derive(Debug, Clone, Copy, PartialEq, serde::Deserialize, serde::Serialize)]
+#[repr(C, packed)]
 pub struct PacketCarSetupData {
     /// Header
     pub header: super::PacketHeader,
@@ -29,6 +39,7 @@ impl super::Attributes for PacketCarSetupData {
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, serde::Deserialize, serde::Serialize)]
+#[repr(C, packed)]
 struct CarSetupData {
     /// Front wing aero
     pub front_wing: u8,
