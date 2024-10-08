@@ -1,4 +1,5 @@
 mod car_setups;
+mod car_telemetry;
 mod event;
 mod header;
 mod lap;
@@ -9,6 +10,7 @@ mod session;
 use std::fmt::Display;
 
 pub use car_setups::PacketCarSetupData;
+pub use car_telemetry::PacketCarTelemetryData;
 pub use event::PacketEventData;
 pub use header::PacketHeader;
 pub use lap::PacketLapData;
@@ -67,6 +69,7 @@ pub enum Packet {
     Event(PacketEventData),
     Participants(PacketParticipantsData),
     CarSetups(PacketCarSetupData),
+    CarTelemetry(PacketCarTelemetryData),
 }
 
 #[derive(Debug)]
@@ -121,6 +124,9 @@ impl FromBytes for Packet {
                 buf,
             )?)),
             PacketID::CarSetups => Ok(Packet::CarSetups(PacketCarSetupData::from_bytes(buf)?)),
+            PacketID::CarTelemetry => Ok(Packet::CarTelemetry(PacketCarTelemetryData::from_bytes(
+                buf,
+            )?)),
             _ => Err(PacketError::InvalidPacketID(header.packet_id)),
         }
     }
@@ -136,6 +142,7 @@ impl Attributes for Packet {
             Packet::Event(data) => data.header(),
             Packet::Participants(data) => data.header(),
             Packet::CarSetups(data) => data.header(),
+            Packet::CarTelemetry(data) => data.header(),
         }
     }
 
@@ -148,6 +155,7 @@ impl Attributes for Packet {
             Packet::Event(data) => data.packet_id(),
             Packet::Participants(data) => data.packet_id(),
             Packet::CarSetups(data) => data.packet_id(),
+            Packet::CarTelemetry(data) => data.packet_id(),
         }
     }
 }
