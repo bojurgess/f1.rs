@@ -42,27 +42,27 @@ impl super::Attributes for PacketParticipantsData {
 #[derive(Debug, Clone, Copy, PartialEq, serde::Deserialize, serde::Serialize)]
 pub struct ParticipantData {
     /// Whether the vehicle is AI (1) or Human (0) controlled
-    pub m_ai_controlled: u8,
+    pub ai_controlled: u8,
     /// Driver ID - see appendix, 255 if network human
-    pub m_driver_id: u8,
+    pub driver_id: u8,
     /// Network ID – unique identifier for network players
-    pub m_network_id: u8,
+    pub network_id: u8,
     /// Team ID - see appendix
-    pub m_team_id: u8,
+    pub team_id: u8,
     /// My team flag – 1 = My Team, 0 = otherwise
-    pub m_my_team: u8,
+    pub my_team: u8,
     /// Race number of the car
-    pub m_race_number: u8,
+    pub race_number: u8,
     /// Nationality of the driver
-    pub m_nationality: u8,
+    pub nationality: u8,
     /// Name of participant in UTF-8 format – null terminated
     /// Will be truncated with … (U+2026) if too long
     #[serde(with = "BigArray")]
-    pub m_name: [u8; 48],
+    pub name: [u8; 48],
     /// The player's UDP setting 0 = restricted, 1 = public
-    pub m_your_telemetry: u8,
+    pub your_telemetry: u8,
     /// The player's show online names setting, 0 = off, 1 = on
-    pub m_show_online_names: u8,
+    pub show_online_names: u8,
     /// 1 = Steam, 3 = PlayStation, 4 = Xbox, 6 = Origin, 255 = unknown
-    pub m_platform: u8,
+    pub platform: u8,
 }
