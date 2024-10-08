@@ -2,7 +2,15 @@ use bincode::deserialize_from;
 
 use super::{Attributes, FromBytes, PacketError, PacketHeader};
 
+/// Event Packet
+///
+/// This packet gives details of events that happen during the course of a session.
+///
+/// Frequency: When the event occurs  
+/// Size: 45 bytes  
+/// Version: 1
 #[derive(Debug, Clone, Copy, PartialEq, serde::Deserialize, serde::Serialize)]
+#[repr(C, packed)]
 pub struct PacketEventData {
     pub header: PacketHeader,
     pub event_string_code: [u8; 4],
