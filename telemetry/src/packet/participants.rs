@@ -8,9 +8,10 @@ use serde_big_array::BigArray;
 /// the vehicle index.
 ///
 /// Frequency: Every 5 seconds  
-/// Size: 1102 bytes  
+/// Size: 1306 bytes  
 /// Version: 1
 #[derive(Debug, Clone, Copy, PartialEq, serde::Deserialize, serde::Serialize)]
+#[repr(C, packed)]
 pub struct PacketParticipantsData {
     /// Header
     pub header: super::PacketHeader,
@@ -40,6 +41,7 @@ impl super::Attributes for PacketParticipantsData {
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, serde::Deserialize, serde::Serialize)]
+#[repr(C, packed)]
 pub struct ParticipantData {
     /// Whether the vehicle is AI (1) or Human (0) controlled
     pub ai_controlled: u8,
