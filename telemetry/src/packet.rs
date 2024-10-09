@@ -1,3 +1,4 @@
+mod car_damage;
 mod car_setups;
 mod car_status;
 mod car_telemetry;
@@ -12,6 +13,7 @@ mod session;
 
 use std::fmt::Display;
 
+pub use car_damage::PacketCarDamageData;
 pub use car_setups::PacketCarSetupData;
 pub use car_status::PacketCarStatusData;
 pub use car_telemetry::PacketCarTelemetryData;
@@ -79,6 +81,7 @@ pub enum Packet {
     CarStatus(PacketCarStatusData),
     FinalClassification(PacketFinalClassificationData),
     LobbyInfo(PacketLobbyInfoData),
+    CarDamage(PacketCarDamageData),
 }
 
 #[derive(Debug)]
@@ -141,6 +144,7 @@ impl FromBytes for Packet {
                 PacketFinalClassificationData::from_bytes(buf)?,
             )),
             PacketID::LobbyInfo => Ok(Packet::LobbyInfo(PacketLobbyInfoData::from_bytes(buf)?)),
+            PacketID::CarDamage => Ok(Packet::CarDamage(PacketCarDamageData::from_bytes(buf)?)),
             _ => Err(PacketError::InvalidPacketID(header.packet_id)),
         }
     }
@@ -160,6 +164,7 @@ impl Attributes for Packet {
             Packet::CarStatus(data) => data.header(),
             Packet::FinalClassification(data) => data.header(),
             Packet::LobbyInfo(data) => data.header(),
+            Packet::CarDamage(data) => data.header(),
         }
     }
 
@@ -176,6 +181,7 @@ impl Attributes for Packet {
             Packet::CarStatus(data) => data.packet_id(),
             Packet::FinalClassification(data) => data.packet_id(),
             Packet::LobbyInfo(data) => data.packet_id(),
+            Packet::CarDamage(data) => data.packet_id(),
         }
     }
 }
