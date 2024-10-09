@@ -2,6 +2,7 @@ mod car_setups;
 mod car_status;
 mod car_telemetry;
 mod event;
+mod final_classification;
 mod header;
 mod lap;
 mod motion;
@@ -14,6 +15,7 @@ pub use car_setups::PacketCarSetupData;
 pub use car_status::PacketCarStatusData;
 pub use car_telemetry::PacketCarTelemetryData;
 pub use event::PacketEventData;
+pub use final_classification::PacketFinalClassificationData;
 pub use header::PacketHeader;
 pub use lap::PacketLapData;
 pub use motion::PacketMotionData;
@@ -73,6 +75,7 @@ pub enum Packet {
     CarSetups(PacketCarSetupData),
     CarTelemetry(PacketCarTelemetryData),
     CarStatus(PacketCarStatusData),
+    FinalClassification(PacketFinalClassificationData),
 }
 
 #[derive(Debug)]
@@ -131,6 +134,9 @@ impl FromBytes for Packet {
                 buf,
             )?)),
             PacketID::CarStatus => Ok(Packet::CarStatus(PacketCarStatusData::from_bytes(buf)?)),
+            PacketID::FinalClassification => Ok(Packet::FinalClassification(
+                PacketFinalClassificationData::from_bytes(buf)?,
+            )),
             _ => Err(PacketError::InvalidPacketID(header.packet_id)),
         }
     }
@@ -148,6 +154,7 @@ impl Attributes for Packet {
             Packet::CarSetups(data) => data.header(),
             Packet::CarTelemetry(data) => data.header(),
             Packet::CarStatus(data) => data.header(),
+            Packet::FinalClassification(data) => data.header(),
         }
     }
 
@@ -162,6 +169,7 @@ impl Attributes for Packet {
             Packet::CarSetups(data) => data.packet_id(),
             Packet::CarTelemetry(data) => data.packet_id(),
             Packet::CarStatus(data) => data.packet_id(),
+            Packet::FinalClassification(data) => data.packet_id(),
         }
     }
 }
