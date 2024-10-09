@@ -11,6 +11,7 @@ mod motion;
 mod participants;
 mod session;
 mod session_history;
+mod tyre_sets;
 
 use std::fmt::Display;
 
@@ -27,6 +28,7 @@ pub use motion::PacketMotionData;
 pub use participants::PacketParticipantsData;
 pub use session::PacketSessionData;
 pub use session_history::PacketSessionHistoryData;
+use tyre_sets::PacketTyreSetData;
 
 #[derive(Debug, PartialEq, Clone, serde::Serialize, serde::Deserialize)]
 pub enum PacketID {
@@ -85,6 +87,7 @@ pub enum Packet {
     LobbyInfo(PacketLobbyInfoData),
     CarDamage(PacketCarDamageData),
     SessionHistory(PacketSessionHistoryData),
+    TyreSets(PacketTyreSetData),
 }
 
 #[derive(Debug)]
@@ -151,6 +154,7 @@ impl FromBytes for Packet {
             PacketID::SessionHistory => Ok(Packet::SessionHistory(
                 PacketSessionHistoryData::from_bytes(buf)?,
             )),
+            PacketID::TyreSets => Ok(Packet::TyreSets(PacketTyreSetData::from_bytes(buf)?)),
             _ => Err(PacketError::InvalidPacketID(header.packet_id)),
         }
     }
@@ -172,6 +176,7 @@ impl Attributes for Packet {
             Packet::LobbyInfo(data) => data.header(),
             Packet::CarDamage(data) => data.header(),
             Packet::SessionHistory(data) => data.header(),
+            Packet::TyreSets(data) => data.header(),
         }
     }
 
@@ -190,6 +195,7 @@ impl Attributes for Packet {
             Packet::LobbyInfo(data) => data.packet_id(),
             Packet::CarDamage(data) => data.packet_id(),
             Packet::SessionHistory(data) => data.packet_id(),
+            Packet::TyreSets(data) => data.packet_id(),
         }
     }
 }
