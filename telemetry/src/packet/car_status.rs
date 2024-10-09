@@ -1,5 +1,12 @@
 use super::{Attributes, FromBytes, PacketID};
 
+/// # Car Status Packet
+///
+/// This packet details the status of all the cars in the race, such as fuel, ERS and engine health.
+///
+/// Frequency: Rate as specified in menus  
+/// Size: 1239 bytes  
+/// Version: 1  
 #[derive(Debug, Clone, Copy, PartialEq, serde::Deserialize, serde::Serialize)]
 #[repr(C, packed)]
 pub struct PacketCarStatusData {
