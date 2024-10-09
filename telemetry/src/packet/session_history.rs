@@ -2,15 +2,15 @@ use serde_big_array::BigArray;
 
 use super::{Attributes, FromBytes};
 
-/// Session History Packet
+/// # Session History Packet
 ///
 /// This packet contains lap times and tyre usage for the session. It works slightly differently
 /// from other packets. To reduce CPU and badnwidth, each packet relates to a specific vehicle
 /// and is sent every 1/20s, cycling through cars. Therefore, in a 20-car race,
 /// you should recieve an update for each vehicle at least once per second
 ///
-/// Frequency: 20 per second but cycling through cars
-/// Size: 1460 bytes
+/// Frequency: 20 per second but cycling through cars  
+/// Size: 1460 bytes  
 /// Version: 1
 #[derive(Debug, Clone, Copy, PartialEq, serde::Serialize, serde::Deserialize)]
 #[repr(C, packed)]
