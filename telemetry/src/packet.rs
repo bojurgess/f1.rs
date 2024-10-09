@@ -8,6 +8,7 @@ mod header;
 mod lap;
 mod lobby_info;
 mod motion;
+mod motion_ex;
 mod participants;
 mod session;
 mod session_history;
@@ -25,6 +26,7 @@ pub use header::PacketHeader;
 pub use lap::PacketLapData;
 pub use lobby_info::PacketLobbyInfoData;
 pub use motion::PacketMotionData;
+use motion_ex::PacketMotionExData;
 pub use participants::PacketParticipantsData;
 pub use session::PacketSessionData;
 pub use session_history::PacketSessionHistoryData;
@@ -65,6 +67,8 @@ impl From<u8> for PacketID {
             11 => PacketID::SessionHistory,
             12 => PacketID::TyreSets,
             13 => PacketID::MotionEx,
+            // Something catastrophically wrong has happened if this code path executes
+            // (just saying)
             _ => panic!("Invalid packet ID"),
         }
     }
@@ -88,6 +92,7 @@ pub enum Packet {
     CarDamage(PacketCarDamageData),
     SessionHistory(PacketSessionHistoryData),
     TyreSets(PacketTyreSetData),
+    MotionEx(PacketMotionExData),
 }
 
 #[derive(Debug)]
@@ -155,7 +160,7 @@ impl FromBytes for Packet {
                 PacketSessionHistoryData::from_bytes(buf)?,
             )),
             PacketID::TyreSets => Ok(Packet::TyreSets(PacketTyreSetData::from_bytes(buf)?)),
-            _ => Err(PacketError::InvalidPacketID(header.packet_id)),
+            PacketID::MotionEx => Ok(Packet::MotionEx(PacketMotionExData::from_bytes(buf)?)),
         }
     }
 }
@@ -177,6 +182,7 @@ impl Attributes for Packet {
             Packet::CarDamage(data) => data.header(),
             Packet::SessionHistory(data) => data.header(),
             Packet::TyreSets(data) => data.header(),
+            Packet::MotionEx(data) => data.header(),
         }
     }
 
@@ -196,6 +202,7 @@ impl Attributes for Packet {
             Packet::CarDamage(data) => data.packet_id(),
             Packet::SessionHistory(data) => data.packet_id(),
             Packet::TyreSets(data) => data.packet_id(),
+            Packet::MotionEx(data) => data.packet_id(),
         }
     }
 }
