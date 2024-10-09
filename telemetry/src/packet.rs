@@ -10,6 +10,7 @@ mod lobby_info;
 mod motion;
 mod participants;
 mod session;
+mod session_history;
 
 use std::fmt::Display;
 
@@ -25,6 +26,7 @@ pub use lobby_info::PacketLobbyInfoData;
 pub use motion::PacketMotionData;
 pub use participants::PacketParticipantsData;
 pub use session::PacketSessionData;
+pub use session_history::PacketSessionHistoryData;
 
 #[derive(Debug, PartialEq, Clone, serde::Serialize, serde::Deserialize)]
 pub enum PacketID {
@@ -82,6 +84,7 @@ pub enum Packet {
     FinalClassification(PacketFinalClassificationData),
     LobbyInfo(PacketLobbyInfoData),
     CarDamage(PacketCarDamageData),
+    SessionHistory(PacketSessionHistoryData),
 }
 
 #[derive(Debug)]
@@ -145,6 +148,9 @@ impl FromBytes for Packet {
             )),
             PacketID::LobbyInfo => Ok(Packet::LobbyInfo(PacketLobbyInfoData::from_bytes(buf)?)),
             PacketID::CarDamage => Ok(Packet::CarDamage(PacketCarDamageData::from_bytes(buf)?)),
+            PacketID::SessionHistory => Ok(Packet::SessionHistory(
+                PacketSessionHistoryData::from_bytes(buf)?,
+            )),
             _ => Err(PacketError::InvalidPacketID(header.packet_id)),
         }
     }
@@ -165,6 +171,7 @@ impl Attributes for Packet {
             Packet::FinalClassification(data) => data.header(),
             Packet::LobbyInfo(data) => data.header(),
             Packet::CarDamage(data) => data.header(),
+            Packet::SessionHistory(data) => data.header(),
         }
     }
 
@@ -182,6 +189,7 @@ impl Attributes for Packet {
             Packet::FinalClassification(data) => data.packet_id(),
             Packet::LobbyInfo(data) => data.packet_id(),
             Packet::CarDamage(data) => data.packet_id(),
+            Packet::SessionHistory(data) => data.packet_id(),
         }
     }
 }
